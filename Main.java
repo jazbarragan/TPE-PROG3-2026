@@ -2,36 +2,43 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Main{
+public class Main {
     public static void main(String[] args) {
 
-        //Leer camiones del .csv e imprimirlos
+        // Leer camiones del .csv e imprimirlos
         ArrayList<Camion> camiones = leerCamiones();
-        imprimirCamiones(camiones);
+        //imprimirCamiones(camiones);
 
-        //Leer paquetes del .csv e imprimirlos
+        // Leer paquetes del .csv e imprimirlos
         ArrayList<Paquete> paquetes = leerPaquetes();
-        imprimirPaquetes(paquetes);
+        //imprimirPaquetes(paquetes);
 
-        //--- SERVICIOS ---
+        // --- SERVICIOS ---
         Servicios servicios = new Servicios();
-        System.out.println("--- Servicio 1 ---");
-        System.out.println(servicios.servicio1(paquetes, "P001"))  ;
-        System.out.println(servicios.servicio1(paquetes, "P0dcer01"))  ;
+        servicios.inicializarIndices(paquetes);
 
+        // --- PRUEBA SERVICIO 1 ---
+        System.out.println("----- Servicio 1 (Por Código) -----");
 
-        System.out.println("--- Servicio 2 true ---");
-        imprimirPaquetes(servicios.servicio2(paquetes, true));    
-        System.out.println("--- Servicio 2 false ---");
-        imprimirPaquetes(servicios.servicio2(paquetes, false));
+        System.out.println(servicios.servicio1("P001"));
+        System.out.println(servicios.servicio1("P0dcer01"));
 
-        System.out.println("--- Servicio 3 ---");
-        imprimirPaquetes(servicios.servicio3(paquetes, 9, 90));
+        // --- PRUEBA SERVICIO 2 ---
+        System.out.println("\n----- Servicio 2 (Por Alimentos) ------");
+        // Podés probar el servicio 2 que optimizamos antes de forma directa e
+        // instantánea
+        System.out.println("Paquetes con alimentos: " + servicios.servicio2(true));
+        System.out.println("Paquetes sin alimentos: " + servicios.servicio2(false));
+
+        System.out.println("----- Servicio 3 (de un X a un Y) -----");
+        System.out.println("Paquetes sin alimentos: " + servicios.servicio3(2,80));
     }
 
-    //Cargar camiones desde el .csv
+    // Cargar camiones desde el .csv
     public static ArrayList<Camion> leerCamiones() {
         ArrayList<Camion> camiones = new ArrayList<>();
 
@@ -62,7 +69,7 @@ public class Main{
         }
     }
 
-    //Cargar paquetes desde el .csv
+    // Cargar paquetes desde el .csv
     public static ArrayList<Paquete> leerPaquetes() {
         ArrayList<Paquete> paquetes = new ArrayList<>();
 
@@ -88,7 +95,7 @@ public class Main{
         return paquetes;
     }
 
-    //Imprimir paquetes
+    // Imprimir paquetes
     public static void imprimirPaquetes(ArrayList<Paquete> paquetes) {
         for (Paquete paquete : paquetes) {
             System.out.println(paquete);

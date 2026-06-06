@@ -1,41 +1,72 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Servicios {
     
-    public Paquete servicio1(ArrayList<Paquete> paquetes, String codigo) {
-        // Servicio 1: Dado un código de paquete (String), retornar toda la información
-        //del paquete asociado. En caso de no existir, retornar null.
-        for (Paquete paquete : paquetes) {
-            if (paquete.getCodigoIdentificador().equals(codigo)) {
-                return paquete;
-            }
-        }
-        return null;
+    private final Map<String, Paquete> indicePorCodigo;
+    private final Map<Boolean, List<Paquete>> indiceAlimentos;
+    
+    // NUEVO ÍNDICE: Un Árbol para búsquedas por rangos de urgencia
+    private final TreeMap<Integer, List<Paquete>> indicePorUrgencia;
+
+    public Servicios() {
+        this.indicePorCodigo = new HashMap<>();
+        this.indiceAlimentos = new HashMap<>();
+        this.indicePorUrgencia = new TreeMap<>(); // Inicializamos el árbol
+        
+        this.indiceAlimentos.put(true, new ArrayList<>());
+        this.indiceAlimentos.put(false, new ArrayList<>());
     }
 
-    public ArrayList<Paquete> servicio2(ArrayList<Paquete> paquetes, boolean contieneAlimentos) {
-        // Servicio 2: Dado un booleano que indica si se buscan paquetes que
-        // contienen alimentos (true) o que no contienen alimentos (false), retornar el
-        // listado de paquetes correspondiente.
-        ArrayList<Paquete> resultado = new ArrayList<>();
+    /**
+     * Procesa la lista por única vez, armando los TRES índices en un solo bucle.
+     * Costo computacional: O(N log N) debido a la inserción en el árbol.
+     */
+    public void inicializarIndices(List<Paquete> paquetes) {
         for (Paquete paquete : paquetes) {
-            if (paquete.isContieneAlimentos() == contieneAlimentos) {
-                resultado.add(paquete);
-            }
+            // 1. Índice Servicio 1
+            this.indicePorCodigo.put(paquete.getCodigoIdentificador(), paquete);
+            
+            // 2. Índice Servicio 2
+            this.indiceAlimentos.get(paquete.isContieneAlimentos()).add(paquete);
+            
+            // 3. Índice Servicio 3 (Árbol por Urgencia)
+            int urgencia = paquete.getUrgencia();
+            // Si es la primera vez que vemos este nivel de urgencia, creamos su lista
+            this.indicePorUrgencia.putIfAbsent(urgencia, new ArrayList<>());
+            this.indicePorUrgencia.get(urgencia).add(paquete);
         }
-        return resultado;
     }
 
-    public ArrayList<Paquete> servicio3(ArrayList<Paquete> paquetes, int urgenciaMin, int urgenciaMax) {
-            // Servicio 3: Dados dos valores enteros que representan un nivel de urgencia
-            // mínimo y máximo, retornar todos los paquetes cuyo nivel de urgencia se
-            // encuentre dentro de ese rango (inclusive)
-        ArrayList<Paquete> resultado = new ArrayList<>();
-        for (Paquete paquete : paquetes) {
-            if (paquete.getUrgencia() >= urgenciaMin && paquete.getUrgencia() <= urgenciaMax) {
-                resultado.add(paquete);
-            }
+    // --- SERVICIO 1 (O(1)) ---
+    public Paquete servicio1(String codigo) {
+        return this.indicePorCodigo.get(codigo);
+    }
+
+    // --- SERVICIO 2 (O(1)) ---
+    public List<Paquete> servicio2(boolean contieneAlimentos) {
+        return this.indiceAlimentos.get(contieneAlimentos);
+    }
+
+    /**
+     * SERVICIO 3: Retorna paquetes en un rango de urgencia (inclusive).
+     * Costo computacional: Mucho menor a O(N). Solo procesa las urgencias del rango.
+     */
+    public List<Paquete> servicio3(int urgenciaMin, int urgenciaMax) {
+        List<Paquete> resultado = new ArrayList<>();
+        
+        // subMap obtiene la parte del árbol entre el min y el max de forma ultra rápida
+        // Los 'true' indican que incluya los extremos (inclusive)
+        Map<Integer, List<Paquete>> rangoUrgencias = this.indicePorUrgencia.subMap(urgenciaMin, true, urgenciaMax, true);
+        
+        // Juntamos las listas de los niveles de urgencia que cayeron en el rango
+        for (List<Paquete> listaPaquetes : rangoUrgencias.values()) {
+            resultado.addAll(listaPaquetes);
         }
+        
         return resultado;
     }
 }
