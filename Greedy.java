@@ -33,10 +33,17 @@ public class Greedy {
         return solucion;
     }
 
-    //ordenamos los paquetes del mas pesado al mas liviano para siempre tomar el primero.
+    //prioridades: con alimentos, mas urgentes y luego mayor peso.
     public ArrayList<Paquete> ordenarPaquetesPorPeso(ArrayList<Paquete> paquetes){
-        //ordenamos los paquetes por peso de mayor a menor
-        paquetes.sort((p1, p2) -> Float.compare(p2.getPeso(), p1.getPeso()));
+        paquetes.sort((p1, p2) -> {
+            if (p1.isContieneAlimentos() != p2.isContieneAlimentos()) {
+                return p1.isContieneAlimentos() ? -1 : 1;
+            }
+            if (p1.getUrgencia() != p2.getUrgencia()) {
+                return Integer.compare(p2.getUrgencia(), p1.getUrgencia());
+            }
+            return Float.compare(p2.getPeso(), p1.getPeso());
+        });
         return paquetes;
     }
 
