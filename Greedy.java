@@ -6,56 +6,53 @@ public class Greedy {
     
     public ArrayList<Camion> asignarPaquetes(ArrayList<Paquete> paquetes, ArrayList<Camion> camiones){
         ArrayList<Camion> solucion = new ArrayList<>();
+        paquetes = this.ordenarPaquetesPorPeso(paquetes); //ordenamos los paquetes para tomar siempre el primero.
+        camiones = this.ordenarCamionesPorPeso(camiones); //ordenamos los camiones por peso de mayor a menor
+        
+        while(!paquetes.isEmpty()){ //mientras que tengamos paquetes para asiganar.
+            Paquete x = paquetes.get(0); //tomamos el primer paquete, que es el mas pesado por la ordenación previa.
 
-        while(!esSolucion(solucion) && !paquetes.isEmpty()){
-           //selecciona el paquete mas pesado
-            Paquete x = this.seleccionar(paquetes);
-
-            //este metodo devuelve
-            //Camion: para asignar
-            //null: no se puede asignar a ningun camion
-            Camion camionAsignado = esFactible(camiones, x);
-            if(camionAsignado != null){
-                for (Camion c : camiones) {
-                    if(c.getId() == camionAsignado.getId()){
-                        c.cargarPaquete(x);
-                        solucion.add(c);
-                    }
-                    
-                }
+            Camion camionAsignado = esFactible(camiones, x); //es factible este paque a algun camion?
+            if(camionAsignado != null){ //retorna un camion si, si. retorna null si, no.
+               camionAsignado.cargarPaquete(x); //cargamos el paquete al camion asignado.
+              if(!solucion.contains(camionAsignado))//si el camion asignado no esta en la solucion, lo agregamos.
+                     solucion.add(camionAsignado); //agregamos el camion a la solucion.
+               
             }else{
                 this.paquetesSinAsignar.add(x);
             }
 
-            paquetes.remove(x);
+            paquetes.remove(0);
+
+            if(!paquetes.isEmpty()){
             
-            x = this.seleccionar(paquetes);
-            
+                x = paquetes.get(0); //tomamos el siguiente paquete, que es el mas pesado por la ordenación previa.
+           
+            }//si ya no quedan paquetes, terminamos el proceso.
         }
         return solucion;
     }
 
-//ORDENAR LOS PAQUETES DEL MAS PESANDO AL MAS LIBINO, PARA QUE SOLO AGREGER Y QUITE SIEMPRE EL PRIMERO Y NO TENGA QUE BUSCAR POR
-// POR TODO EL ARREGLO
-    public Paquete seleccionar(ArrayList<Paquete> paquetes) {
-    // 1. Inicializamos en null por seguridad (si la lista está vacía, devuelve null)
-    Paquete paqueteSolucion = new Paquete(0, null, null, false, 0); 
-    float pesoMax = 0;
+    //ordenamos los paquetes del mas pesado al mas liviano para siempre tomar el primero.
+    public ArrayList<Paquete> ordenarPaquetesPorPeso(ArrayList<Paquete> paquetes){
+        //ordenamos los paquetes por peso de mayor a menor
+        paquetes.sort((p1, p2) -> Float.compare(p2.getPeso(), p1.getPeso()));
+        return paquetes;
+    }
 
-    for (Paquete paquete : paquetes) {
-        // 2. Buscamos el mayor peso
-        if (paquete.getPeso() > pesoMax) {
-            pesoMax = paquete.getPeso();
-            paqueteSolucion = paquete; 
-        }
+    public ArrayList<Camion> ordenarCamionesPorPeso(ArrayList<Camion> camiones){
+        camiones.sort((c1, c2) -> Float.compare(c1.getCapacidadMaxima(), c2.getCapacidadMaxima()));
+        return camiones;
     }
-    
-    return paqueteSolucion;
-    }
+
 
 
     public Camion esFactible(ArrayList<Camion> camiones, Paquete x){
-        //va a retornar si existe un camion de la lista de camiones 
-        //que cumpla con las restricciones para asignar el paque, sino null
+        for (Camion c : camiones) {
+            if( (c.getPesoDisponible() >= x.getPeso()) && ( (x.isContieneAlimentos() == c.isRefrigerado()) || !x.isContieneAlimentos() ) ){ //si el camion tiene espacio y si el paquete necesita refrigeracion, el camion debe ser refrigerado.
+                return c;
+            }
+        }
+        return null;
     }
 }

@@ -35,7 +35,15 @@ public class Main {
         System.out.println("Paquetes sin alimentos: " + servicios.servicio2(false));
 
         System.out.println("----- Servicio 3 (de un X a un Y) -----");
-        System.out.println("Paquetes sin alimentos: " + servicios.servicio3(2,80));
+        System.out.println("Paquetes con urgencia entre X y Y: " + servicios.servicio3(2,80));
+    
+    
+        System.out.println("------------------------GREEDY------------------------");
+        Greedy greedy = new Greedy();
+        ArrayList<Camion> solucionGreedy = greedy.asignarPaquetes(paquetes, camiones);
+        imprimirSolucionGreedy(solucionGreedy);
+
+    
     }
 
     // Cargar camiones desde el .csv
@@ -99,6 +107,25 @@ public class Main {
     public static void imprimirPaquetes(ArrayList<Paquete> paquetes) {
         for (Paquete paquete : paquetes) {
             System.out.println(paquete);
+        }
+    }
+
+    public static void imprimirSolucionGreedy(ArrayList<Camion> camiones) {
+        for (Camion camion : camiones) {
+            System.out.print("Camion con id " + camion.getId() + " tiene los paquetes cargados con id: ");
+
+            if (camion.getPaquetes().isEmpty()) {
+                System.out.println("ninguno");
+            } else {
+                for (int i = 0; i < camion.getPaquetes().size(); i++) {
+                    System.out.print(camion.getPaquetes().get(i).getId());
+
+                    if (i < camion.getPaquetes().size() - 1) {
+                        System.out.print(", ");
+                    }
+                }
+                System.out.println();
+            }
         }
     }
 }

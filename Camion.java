@@ -5,19 +5,30 @@ public class Camion {
 	private String patente;
 	private boolean refrigerado;
 	private Float capacidadMaxima;
-    ArrayList<Paquete> paquetes;
+	private Float pesoDisponible;
+	private ArrayList<Paquete> paquetes = new ArrayList<>();
 
 	public Camion(int id, String patente, boolean refrigerado, Float capacidadMaxima) {
 		this.id = id;
 		this.patente = patente;
 		this.refrigerado = refrigerado;
 		this.capacidadMaxima = capacidadMaxima;
-        this.paquetes = new ArrayList<>();
+        this.pesoDisponible = capacidadMaxima;
+		this.paquetes = new ArrayList<>();
 	}
 
     public void cargarPaquete(Paquete paquete){
+        this.pesoDisponible -= paquete.getPeso();
         this.paquetes.add(paquete);
     }
+
+    public Float getPesoDisponible() {
+        return pesoDisponible;
+    }
+
+	public ArrayList<Paquete> getPaquetes() {
+		return new ArrayList<>(paquetes);
+	}
 
 	public int getId() {
 		return id;
