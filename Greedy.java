@@ -35,7 +35,8 @@ public class Greedy {
         return solucion;
     }
 
-//mejor, ordenar paquetes de mas pesado y tomar siempre el primero
+//ORDENAR LOS PAQUETES DEL MAS PESANDO AL MAS LIBINO, PARA QUE SOLO AGREGER Y QUITE SIEMPRE EL PRIMERO Y NO TENGA QUE BUSCAR POR
+// POR TODO EL ARREGLO
     public Paquete seleccionar(ArrayList<Paquete> paquetes) {
     // 1. Inicializamos en null por seguridad (si la lista está vacía, devuelve null)
     Paquete paqueteSolucion = new Paquete(0, null, null, false, 0); 
