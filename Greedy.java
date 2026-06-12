@@ -12,7 +12,7 @@ public class Greedy {
         while(!paquetes.isEmpty()){ //mientras que tengamos paquetes para asiganar.
             Paquete x = paquetes.get(0); //tomamos el primer paquete, que es el mas pesado por la ordenación previa.
 
-            Camion camionAsignado = esFactible(camiones, x); //es factible este paque a algun camion?
+            Camion camionAsignado = selecionoCamion(camiones, x); //es factible este paque a algun camion?
             if(camionAsignado != null){ //retorna un camion si, si. retorna null si, no.
                camionAsignado.cargarPaquete(x); //cargamos el paquete al camion asignado.
               if(!solucion.contains(camionAsignado))//si el camion asignado no esta en la solucion, lo agregamos.
@@ -24,11 +24,6 @@ public class Greedy {
 
             paquetes.remove(0);
 
-            if(!paquetes.isEmpty()){
-            
-                x = paquetes.get(0); //tomamos el siguiente paquete, que es el mas pesado por la ordenación previa.
-           
-            }//si ya no quedan paquetes, terminamos el proceso.
         }
         return solucion;
     }
@@ -54,9 +49,9 @@ public class Greedy {
 
 
 
-    public Camion esFactible(ArrayList<Camion> camiones, Paquete x){
+    public Camion selecionoCamion(ArrayList<Camion> camiones, Paquete paquetes){
         for (Camion c : camiones) {
-            if( (c.getPesoDisponible() >= x.getPeso()) && ( (x.isContieneAlimentos() == c.isRefrigerado()) || !x.isContieneAlimentos() ) ){ //si el camion tiene espacio y si el paquete necesita refrigeracion, el camion debe ser refrigerado.
+            if( (c.getPesoDisponible() >= paquetes.getPeso()) && ( (paquetes.isContieneAlimentos() == c.isRefrigerado()) || !paquetes.isContieneAlimentos() ) ){ //si el camion tiene espacio y si el paquete necesita refrigeracion, el camion debe ser refrigerado.
                 return c;
             }
         }

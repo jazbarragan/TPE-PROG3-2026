@@ -53,20 +53,10 @@ public class Servicios {
 
     /**
      * SERVICIO 3: Retorna paquetes en un rango de urgencia (inclusive).
-     * Costo computacional: Mucho menor a O(N). Solo procesa las urgencias del rango.
+     
      */
     public List<Paquete> servicio3(int urgenciaMin, int urgenciaMax) {
-        List<Paquete> resultado = new ArrayList<>();
         
-        // subMap obtiene la parte del árbol entre el min y el max de forma ultra rápida
-        // Los 'true' indican que incluya los extremos (inclusive)
-        Map<Integer, List<Paquete>> rangoUrgencias = this.indicePorUrgencia.subMap(urgenciaMin, true, urgenciaMax, true);
-        
-        // Juntamos las listas de los niveles de urgencia que cayeron en el rango
-        for (List<Paquete> listaPaquetes : rangoUrgencias.values()) {
-            resultado.addAll(listaPaquetes);
-        }
-        
-        return resultado;
+        return null;
     }
 }

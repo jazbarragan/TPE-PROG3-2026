@@ -22,6 +22,13 @@ public class Camion {
         this.paquetes.add(paquete);
     }
 
+	public void descagarPaqute(Paquete paquete){
+		if (this.paquetes.contains(paquete)) {
+			this.pesoDisponible += paquete.getPeso();
+			this.paquetes.remove(paquete);	
+		}		
+	}
+
     public Float getPesoDisponible() {
         return pesoDisponible;
     }
