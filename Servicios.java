@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Servicios {
-    
+
     private final Map<String, Paquete> indicePorCodigo;
     private final Map<Boolean, List<Paquete>> indiceAlimentos;
-    
+
     // NUEVO ÍNDICE: Un Árbol para búsquedas por rangos de urgencia
     private final TreeMap<Integer, List<Paquete>> indicePorUrgencia;
 
@@ -16,7 +16,7 @@ public class Servicios {
         this.indicePorCodigo = new HashMap<>();
         this.indiceAlimentos = new HashMap<>();
         this.indicePorUrgencia = new TreeMap<>(); // Inicializamos el árbol
-        
+
         this.indiceAlimentos.put(true, new ArrayList<>());
         this.indiceAlimentos.put(false, new ArrayList<>());
     }
@@ -29,10 +29,10 @@ public class Servicios {
         for (Paquete paquete : paquetes) {
             // 1. Índice Servicio 1
             this.indicePorCodigo.put(paquete.getCodigoIdentificador(), paquete);
-            
+
             // 2. Índice Servicio 2
             this.indiceAlimentos.get(paquete.isContieneAlimentos()).add(paquete);
-            
+
             // 3. Índice Servicio 3 (Árbol por Urgencia)
             int urgencia = paquete.getUrgencia();
             // Si es la primera vez que vemos este nivel de urgencia, creamos su lista
@@ -53,10 +53,18 @@ public class Servicios {
 
     /**
      * SERVICIO 3: Retorna paquetes en un rango de urgencia (inclusive).
-     
+     * O(log N + K)     
      */
     public List<Paquete> servicio3(int urgenciaMin, int urgenciaMax) {
-        
-        return null;
+        List<Paquete> resultado = new ArrayList<>();
+
+        Map<Integer, List<Paquete>> subMapa = this.indicePorUrgencia.subMap(urgenciaMin, true, urgenciaMax, true);
+
+        for (List<Paquete> paquetes : subMapa.values()) {
+            resultado.addAll(paquetes);
+        }
+
+        return resultado;
+
     }
 }

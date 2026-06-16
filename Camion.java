@@ -13,25 +13,34 @@ public class Camion {
 		this.patente = patente;
 		this.refrigerado = refrigerado;
 		this.capacidadMaxima = capacidadMaxima;
-        this.pesoDisponible = capacidadMaxima;
+		this.pesoDisponible = capacidadMaxima;
 		this.paquetes = new ArrayList<>();
 	}
 
-    public void cargarPaquete(Paquete paquete){
-        this.pesoDisponible -= paquete.getPeso();
-        this.paquetes.add(paquete);
-    }
-
-	public void descagarPaqute(Paquete paquete){
-		if (this.paquetes.contains(paquete)) {
-			this.pesoDisponible += paquete.getPeso();
-			this.paquetes.remove(paquete);	
-		}		
+	public Camion(Camion otro) {
+		this.id = otro.id;
+		this.patente = otro.patente;
+		this.refrigerado = otro.refrigerado;
+		this.capacidadMaxima = otro.capacidadMaxima;
+		this.pesoDisponible = otro.pesoDisponible;
+		this.paquetes = new ArrayList<>(otro.paquetes);
 	}
 
-    public Float getPesoDisponible() {
-        return pesoDisponible;
-    }
+	public void cargarPaquete(Paquete paquete) {
+		this.pesoDisponible -= paquete.getPeso();
+		this.paquetes.add(paquete);
+	}
+
+	public void descagarPaqute(Paquete paquete) {
+		if (this.paquetes.contains(paquete)) {
+			this.pesoDisponible += paquete.getPeso();
+			this.paquetes.remove(paquete);
+		}
+	}
+
+	public Float getPesoDisponible() {
+		return pesoDisponible;
+	}
 
 	public ArrayList<Paquete> getPaquetes() {
 		return new ArrayList<>(paquetes);
@@ -71,6 +80,7 @@ public class Camion {
 
 	@Override
 	public String toString() {
-		return "Camion{id=" + id + ", patente='" + patente + "', refrigerado=" + refrigerado + ", capacidadMaxima=" + capacidadMaxima + "}";
+		return "Camion{id=" + id + ", patente='" + patente + "', refrigerado=" + refrigerado + ", capacidadMaxima="
+				+ capacidadMaxima + "}";
 	}
 }

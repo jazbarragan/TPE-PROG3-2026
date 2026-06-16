@@ -1,60 +1,105 @@
 import java.util.ArrayList;
 
 public class Greedy {
-    ArrayList<Paquete> paquetesSinAsignar = new ArrayList<>();
 
-    
-    public ArrayList<Camion> asignarPaquetes(ArrayList<Paquete> paquetes, ArrayList<Camion> camiones){
-        ArrayList<Camion> solucion = new ArrayList<>();
-        paquetes = this.ordenarPaquetesPorPeso(paquetes); //ordenamos los paquetes para tomar siempre el primero.
-        camiones = this.ordenarCamionesPorPeso(camiones); //ordenamos los camiones por peso de mayor a menor
-        
-        while(!paquetes.isEmpty()){ //mientras que tengamos paquetes para asiganar.
-            Paquete x = paquetes.get(0); //tomamos el primer paquete, que es el mas pesado por la ordenación previa.
+    /**
+     * Estrategia Greedy:
+     *
+     * 1. Se ordenan los paquetes priorizando:
+     *    - Paquetes con alimentos.
+     *    - Mayor urgencia.
+     *    - Mayor peso.
+     *
+     * 2. Se ordenan los camiones por capacidad máxima.
+     *
+     * 3. En cada iteración se toma el paquete de mayor prioridad
+     *    y se lo asigna al primer camión que pueda transportarlo.
+     *
+     * 4. Si ningún camión puede cargar el paquete, éste se agrega
+     *    a la lista de paquetes no asignados.
+     *
+     * La estrategia es greedy porque toma decisiones locales
+     * sin reconsiderar asignaciones realizadas anteriormente.
+     */
 
-            Camion camionAsignado = selecionoCamion(camiones, x); //es factible este paque a algun camion?
-            if(camionAsignado != null){ //retorna un camion si, si. retorna null si, no.
-               camionAsignado.cargarPaquete(x); //cargamos el paquete al camion asignado.
-              if(!solucion.contains(camionAsignado))//si el camion asignado no esta en la solucion, lo agregamos.
-                     solucion.add(camionAsignado); //agregamos el camion a la solucion.
-               
-            }else{
-                this.paquetesSinAsignar.add(x);
+    private ArrayList<Paquete> paquetesNoAsignados = new ArrayList<>();
+
+    public ArrayList<Camion> asignarPaquetes(ArrayList<Paquete> paquetes, ArrayList<Camion> camiones) {
+
+        ArrayList<Camion> camionesUtilizados = new ArrayList<>();
+
+        paquetes = ordenarPaquetesPorPrioridad(paquetes);
+        camiones = ordenarCamionesPorCapacidad(camiones);
+
+        while (!paquetes.isEmpty()) {
+
+            Paquete paqueteActual = paquetes.get(0);
+
+            Camion camionSeleccionado = seleccionarCamion(camiones, paqueteActual);
+
+            if (camionSeleccionado != null) {
+
+                camionSeleccionado.cargarPaquete(paqueteActual);
+
+                if (!camionesUtilizados.contains(camionSeleccionado)) {
+                    camionesUtilizados.add(camionSeleccionado);
+                }
+
+            } else {
+                paquetesNoAsignados.add(paqueteActual);
             }
 
             paquetes.remove(0);
-
         }
-        return solucion;
+
+        return camionesUtilizados;
     }
 
-    //prioridades: con alimentos, mas urgentes y luego mayor peso.
-    public ArrayList<Paquete> ordenarPaquetesPorPeso(ArrayList<Paquete> paquetes){
+    public ArrayList<Paquete> ordenarPaquetesPorPrioridad(ArrayList<Paquete> paquetes) {
+
         paquetes.sort((p1, p2) -> {
+
             if (p1.isContieneAlimentos() != p2.isContieneAlimentos()) {
                 return p1.isContieneAlimentos() ? -1 : 1;
             }
+
             if (p1.getUrgencia() != p2.getUrgencia()) {
                 return Integer.compare(p2.getUrgencia(), p1.getUrgencia());
             }
+
             return Float.compare(p2.getPeso(), p1.getPeso());
         });
+
         return paquetes;
     }
 
-    public ArrayList<Camion> ordenarCamionesPorPeso(ArrayList<Camion> camiones){
-        camiones.sort((c1, c2) -> Float.compare(c1.getCapacidadMaxima(), c2.getCapacidadMaxima()));
+    public ArrayList<Camion> ordenarCamionesPorCapacidad(ArrayList<Camion> camiones) {
+
+        camiones.sort((c1, c2) ->
+                Float.compare(c1.getCapacidadMaxima(), c2.getCapacidadMaxima()));
+
         return camiones;
     }
 
+    public Camion seleccionarCamion(ArrayList<Camion> camiones, Paquete paquete) {
 
+        for (Camion camionActual : camiones) {
 
-    public Camion selecionoCamion(ArrayList<Camion> camiones, Paquete paquetes){
-        for (Camion c : camiones) {
-            if( (c.getPesoDisponible() >= paquetes.getPeso()) && ( (paquetes.isContieneAlimentos() == c.isRefrigerado()) || !paquetes.isContieneAlimentos() ) ){ //si el camion tiene espacio y si el paquete necesita refrigeracion, el camion debe ser refrigerado.
-                return c;
+            boolean tieneCapacidad =
+                    camionActual.getPesoDisponible() >= paquete.getPeso();
+
+            boolean cumpleRefrigeracion =
+                    !paquete.isContieneAlimentos() || camionActual.isRefrigerado();
+
+            if (tieneCapacidad && cumpleRefrigeracion) {
+                return camionActual;
             }
         }
+
         return null;
+    }
+
+    public ArrayList<Paquete> getPaquetesNoAsignados() {
+        return paquetesNoAsignados;
     }
 }

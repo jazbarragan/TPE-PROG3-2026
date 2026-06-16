@@ -1,57 +1,126 @@
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-
-        // Leer camiones del .csv e imprimirlos
+        // -----------------------------------------------------------------
+        // 1. CARGA DE DATOS
+        // -----------------------------------------------------------------
         ArrayList<Camion> camiones = leerCamiones();
-        //imprimirCamiones(camiones);
-
-        // Leer paquetes del .csv e imprimirlos
         ArrayList<Paquete> paquetes = leerPaquetes();
-        //imprimirPaquetes(paquetes);
 
-        // --- SERVICIOS ---
+        System.out.println("==================================================");
+        System.out.println("           DATOS CARGADOS INICIALMENTE            ");
+        System.out.println("==================================================");
+        System.out.println("-> Camiones disponibles: " + camiones.size());
+        System.out.println("-> Paquetes por enviar:  " + paquetes.size());
+
+        // -----------------------------------------------------------------
+        // 2. PRUEBA DE SERVICIOS
+        // -----------------------------------------------------------------
+        System.out.println("\n==================================================");
+        System.out.println("               PRUEBA DE SERVICIOS                ");
+        System.out.println("==================================================");
+
         Servicios servicios = new Servicios();
         servicios.inicializarIndices(paquetes);
 
-        // --- PRUEBA SERVICIO 1 ---
-        System.out.println("----- Servicio 1 (Por Código) -----");
+        // Servicio 1: Búsqueda por Código
+        System.out.println("[Servicio 1] Buscando P001: " + servicios.servicio1("P001"));
+        System.out.println("[Servicio 1] Buscando inexistente: " + servicios.servicio1("P0dcer01"));
 
-        System.out.println(servicios.servicio1("P001"));
-        System.out.println(servicios.servicio1("P0dcer01"));
+        // Servicio 2: Filtrado por Alimentos
+        System.out.println("\n[Servicio 2] Paquetes con alimentos: " + servicios.servicio2(true));
+        System.out.println("[Servicio 2] Paquetes sin alimentos: " + servicios.servicio2(false));
 
-        // --- PRUEBA SERVICIO 2 ---
-        System.out.println("\n----- Servicio 2 (Por Alimentos) ------");
-        // Podés probar el servicio 2 que optimizamos antes de forma directa e
-        // instantánea
-        System.out.println("Paquetes con alimentos: " + servicios.servicio2(true));
-        System.out.println("Paquetes sin alimentos: " + servicios.servicio2(false));
+        // Servicio 3: Rango de Urgencia
+        System.out.println("\n[Servicio 3] Paquetes con urgencia entre 2 y 80: \n" + servicios.servicio3(2, 80));
 
-        System.out.println("----- Servicio 3 (de un X a un Y) -----");
-        System.out.println("Paquetes con urgencia entre X y Y: " + servicios.servicio3(2,80));
-    
-    
-        System.out.println("------------------------GREEDY------------------------");
+        // -----------------------------------------------------------------
+        // 3. EJECUCIÓN ALGORITMO GREEDY (Ávido)
+        // -----------------------------------------------------------------
+        System.out.println("\n==================================================");
+        System.out.println("                 EJECUCIÓN GREEDY                 ");
+        System.out.println("==================================================");
+
         Greedy greedy = new Greedy();
         ArrayList<Camion> solucionGreedy = greedy.asignarPaquetes(paquetes, camiones);
         imprimirSolucionGreedy(solucionGreedy);
 
-    
+        // -----------------------------------------------------------------
+        // 4. EJECUCIÓN ALGORITMO BACKTRACKING (Fuerza Bruta Optimizado)
+        // -----------------------------------------------------------------
+        System.out.println("\n==================================================");
+        System.out.println("              EJECUCIÓN BACKTRACKING              ");
+        System.out.println("==================================================");
+
+        // Volvemos a leer los camiones para tenerlos limpios/vacíos de paquetes
+        ArrayList<Camion> camionesBacktracking = leerCamiones();
+        ArrayList<Paquete> paqueteBacktracking = leerPaquetes();
+        Backtracking backtracking = new Backtracking();
+
+        ArrayList<Camion> solucion = backtracking.buscarMejorAsignacion(paqueteBacktracking, camionesBacktracking);
+
+        System.out.println("========== BACKTRACKING ==========");
+
+        System.out.println("\nSolución obtenida:");
+
+        for (Camion camion : solucion) {
+
+            System.out.println("\nCamión " + camion.getId()
+                    + " (" + camion.getPatente() + ")");
+
+            for (Paquete paquete : camion.getPaquetes()) {
+                System.out.println("   - " + paquete);
+            }
+        }
+
+        System.out.println("\nPeso no asignado: "
+                + backtracking.getMenorPesoNoAsignado()
+                + " kg");
+
+        System.out.println("Estados generados: "
+                + backtracking.getEstadosGenerados());
+    }
+
+    private static Path getCsvPath(String fileName) throws IOException {
+        Path path = Paths.get(fileName);
+        if (Files.exists(path)) {
+            return path;
+        }
+
+        Path userDir = Paths.get(System.getProperty("user.dir"));
+        Path candidate = userDir.resolve("TPE-PROG3-2026").resolve(fileName);
+        if (Files.exists(candidate)) {
+            return candidate;
+        }
+
+        candidate = userDir.resolve(fileName);
+        if (Files.exists(candidate)) {
+            return candidate;
+        }
+
+        candidate = userDir.resolve("src").resolve(fileName);
+        if (Files.exists(candidate)) {
+            return candidate;
+        }
+
+        throw new IOException("Archivo no encontrado: " + fileName + ". Rutas buscadas: "
+                + path.toAbsolutePath() + ", "
+                + candidate.toAbsolutePath());
     }
 
     // Cargar camiones desde el .csv
-    public static ArrayList<Camion> leerCamiones() {
+    private static ArrayList<Camion> leerCamiones() {
         ArrayList<Camion> camiones = new ArrayList<>();
 
         try {
-            List<String> lineas = Files.readAllLines(Paths.get("camiones.csv"));
+            Path path = getCsvPath("camiones.csv");
+            List<String> lineas = Files.readAllLines(path);
 
             for (int i = 1; i < lineas.size(); i++) {
                 String[] partes = lineas.get(i).split(";");
@@ -78,11 +147,12 @@ public class Main {
     }
 
     // Cargar paquetes desde el .csv
-    public static ArrayList<Paquete> leerPaquetes() {
+    private static ArrayList<Paquete> leerPaquetes() {
         ArrayList<Paquete> paquetes = new ArrayList<>();
 
         try {
-            List<String> lineas = Files.readAllLines(Paths.get("paquetes.csv"));
+            Path path = getCsvPath("paquetes.csv");
+            List<String> lineas = Files.readAllLines(path);
 
             for (int i = 1; i < lineas.size(); i++) {
                 String[] partes = lineas.get(i).split(";");
@@ -104,13 +174,13 @@ public class Main {
     }
 
     // Imprimir paquetes
-    public static void imprimirPaquetes(ArrayList<Paquete> paquetes) {
+    private static void imprimirPaquetes(ArrayList<Paquete> paquetes) {
         for (Paquete paquete : paquetes) {
             System.out.println(paquete);
         }
     }
 
-    public static void imprimirSolucionGreedy(ArrayList<Camion> camiones) {
+    private static void imprimirSolucionGreedy(ArrayList<Camion> camiones) {
         for (Camion camion : camiones) {
             System.out.print("Camion con id " + camion.getId() + " tiene los paquetes cargados con id: ");
 
