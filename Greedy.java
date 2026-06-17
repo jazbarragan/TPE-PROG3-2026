@@ -24,7 +24,8 @@ public class Greedy {
 
     private ArrayList<Paquete> paquetesNoAsignados = new ArrayList<>();
 
-    public ArrayList<Camion> asignarPaquetes(ArrayList<Paquete> paquetes, ArrayList<Camion> camiones) {
+    public Solucion asignarPaquetes(ArrayList<Paquete> paquetes, ArrayList<Camion> camiones) {
+        int estados = 0;
 
         ArrayList<Camion> camionesUtilizados = new ArrayList<>();
 
@@ -34,6 +35,7 @@ public class Greedy {
         while (!paquetes.isEmpty()) {
 
             Paquete paqueteActual = paquetes.get(0);
+            estados++;
 
             Camion camionSeleccionado = seleccionarCamion(camiones, paqueteActual);
 
@@ -52,7 +54,7 @@ public class Greedy {
             paquetes.remove(0);
         }
 
-        return camionesUtilizados;
+        return new Solucion("Greedy", camionesUtilizados, paquetesNoAsignados, estados);
     }
 
     public ArrayList<Paquete> ordenarPaquetesPorPrioridad(ArrayList<Paquete> paquetes) {

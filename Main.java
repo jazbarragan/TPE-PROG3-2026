@@ -48,8 +48,8 @@ public class Main {
         System.out.println("==================================================");
 
         Greedy greedy = new Greedy();
-        ArrayList<Camion> solucionGreedy = greedy.asignarPaquetes(paquetes, camiones);
-        imprimirSolucionGreedy(solucionGreedy);
+        Solucion solucionGreedy = greedy.asignarPaquetes(paquetes, camiones);
+        System.out.println(solucionGreedy);
 
         // -----------------------------------------------------------------
         // 4. EJECUCIÓN ALGORITMO BACKTRACKING (Fuerza Bruta Optimizado)
@@ -63,28 +63,10 @@ public class Main {
         ArrayList<Paquete> paqueteBacktracking = leerPaquetes();
         Backtracking backtracking = new Backtracking();
 
-        ArrayList<Camion> solucion = backtracking.buscarMejorAsignacion(paqueteBacktracking, camionesBacktracking);
+        Solucion solucionBacktracking = backtracking.buscarMejorAsignacion(paqueteBacktracking, camionesBacktracking);
+        System.out.println(solucionBacktracking);
 
-        System.out.println("========== BACKTRACKING ==========");
-
-        System.out.println("\nSolución obtenida:");
-
-        for (Camion camion : solucion) {
-
-            System.out.println("\nCamión " + camion.getId()
-                    + " (" + camion.getPatente() + ")");
-
-            for (Paquete paquete : camion.getPaquetes()) {
-                System.out.println("   - " + paquete);
-            }
-        }
-
-        System.out.println("\nPeso no asignado: "
-                + backtracking.getMenorPesoNoAsignado()
-                + " kg");
-
-        System.out.println("Estados generados: "
-                + backtracking.getEstadosGenerados());
+       
     }
 
     private static Path getCsvPath(String fileName) throws IOException {

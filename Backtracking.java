@@ -25,7 +25,7 @@ public class Backtracking {
     private float menorPesoNoAsignado;
     private int estadosGenerados;
 
-    public ArrayList<Camion> buscarMejorAsignacion(
+    public Solucion buscarMejorAsignacion(
             ArrayList<Paquete> paquetes,
             ArrayList<Camion> camiones) {
 
@@ -42,7 +42,7 @@ public class Backtracking {
                 0,
                 paquetes);
 
-        return mejorAsignacion;
+        return new Solucion("Backtracking", mejorAsignacion, mejoresPaquetesNoAsignados, estadosGenerados);
     }
 
     private void buscarAsignacion(ArrayList<Camion> camiones, ArrayList<Paquete> paquetesNoAsignadosActuales,
