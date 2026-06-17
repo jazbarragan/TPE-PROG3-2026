@@ -61,6 +61,10 @@ public class Greedy {
 
         paquetes.sort((p1, p2) -> {
 
+            if (p1.getPeso() != p2.getPeso()) {
+                return Float.compare(p2.getPeso(), p1.getPeso());
+            }
+
             if (p1.isContieneAlimentos() != p2.isContieneAlimentos()) {
                 return p1.isContieneAlimentos() ? -1 : 1;
             }
@@ -69,7 +73,7 @@ public class Greedy {
                 return Integer.compare(p2.getUrgencia(), p1.getUrgencia());
             }
 
-            return Float.compare(p2.getPeso(), p1.getPeso());
+            return 0;
         });
 
         return paquetes;
