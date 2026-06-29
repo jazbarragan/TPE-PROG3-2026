@@ -6,8 +6,6 @@ public class Greedy {
      * Estrategia Greedy:
      *
      * 1. Se ordenan los paquetes priorizando:
-     *    - Paquetes con alimentos.
-     *    - Mayor urgencia.
      *    - Mayor peso.
      *
      * 2. Se ordenan los camiones por capacidad máxima.
@@ -29,7 +27,7 @@ public class Greedy {
 
         ArrayList<Camion> camionesUtilizados = new ArrayList<>();
 
-        paquetes = ordenarPaquetesPorPrioridad(paquetes);
+        paquetes = ordenarPaquetesPorPeso(paquetes);
         camiones = ordenarCamionesPorCapacidad(camiones);
 
         while (!paquetes.isEmpty()) {
@@ -57,23 +55,10 @@ public class Greedy {
         return new Solucion("Greedy", camionesUtilizados, paquetesNoAsignados, estados);
     }
 
-    public ArrayList<Paquete> ordenarPaquetesPorPrioridad(ArrayList<Paquete> paquetes) {
+    public ArrayList<Paquete> ordenarPaquetesPorPeso(ArrayList<Paquete> paquetes) {
 
         paquetes.sort((p1, p2) -> {
-
-            if (p1.getPeso() != p2.getPeso()) {
-                return Float.compare(p2.getPeso(), p1.getPeso());
-            }
-
-            if (p1.isContieneAlimentos() != p2.isContieneAlimentos()) {
-                return p1.isContieneAlimentos() ? -1 : 1;
-            }
-
-            if (p1.getUrgencia() != p2.getUrgencia()) {
-                return Integer.compare(p2.getUrgencia(), p1.getUrgencia());
-            }
-
-            return 0;
+            return Float.compare(p2.getPeso(), p1.getPeso());
         });
 
         return paquetes;

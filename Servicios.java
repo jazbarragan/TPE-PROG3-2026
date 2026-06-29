@@ -1,3 +1,7 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,36 +12,43 @@ public class Servicios {
 
     private final Map<String, Paquete> indicePorCodigo;
     private final Map<Boolean, List<Paquete>> indiceAlimentos;
-
-    // NUEVO ÍNDICE: Un Árbol para búsquedas por rangos de urgencia
     private final TreeMap<Integer, List<Paquete>> indicePorUrgencia;
 
-    public Servicios() {
+
+    public Servicios(String pathCamiones, String pathPaquetes) {
         this.indicePorCodigo = new HashMap<>();
         this.indiceAlimentos = new HashMap<>();
         this.indicePorUrgencia = new TreeMap<>(); // Inicializamos el árbol
 
         this.indiceAlimentos.put(true, new ArrayList<>());
         this.indiceAlimentos.put(false, new ArrayList<>());
+        inicializarDesdeCsv(pathPaquetes);
     }
 
-    /**
-     * Procesa la lista por única vez, armando los TRES índices en un solo bucle.
-     * Costo computacional: O(N log N) debido a la inserción en el árbol.
-     */
-    public void inicializarIndices(List<Paquete> paquetes) {
-        for (Paquete paquete : paquetes) {
-            // 1. Índice Servicio 1
-            this.indicePorCodigo.put(paquete.getCodigoIdentificador(), paquete);
+    private void inicializarDesdeCsv(String pathPaquetes) {
+        try {
+            Path path = Paths.get(pathPaquetes);
+            List<String> lineas = Files.readAllLines(path);
 
-            // 2. Índice Servicio 2
-            this.indiceAlimentos.get(paquete.isContieneAlimentos()).add(paquete);
+            for (int i = 1; i < lineas.size(); i++) {
+                String[] partes = lineas.get(i).split(";");
 
-            // 3. Índice Servicio 3 (Árbol por Urgencia)
-            int urgencia = paquete.getUrgencia();
-            // Si es la primera vez que vemos este nivel de urgencia, creamos su lista
-            this.indicePorUrgencia.putIfAbsent(urgencia, new ArrayList<>());
-            this.indicePorUrgencia.get(urgencia).add(paquete);
+                int id = Integer.parseInt(partes[0]);
+                String codigoIdentificador = partes[1];
+                Float peso = Float.parseFloat(partes[2]);
+                boolean contieneAlimentos = partes[3].equals("1");
+                int urgencia = Integer.parseInt(partes[4]);
+
+                Paquete paquete = new Paquete(id, codigoIdentificador, peso, contieneAlimentos, urgencia);
+
+                this.indicePorCodigo.put(paquete.getCodigoIdentificador(), paquete);
+                this.indiceAlimentos.get(paquete.isContieneAlimentos()).add(paquete);
+
+                this.indicePorUrgencia.putIfAbsent(paquete.getUrgencia(), new ArrayList<>());
+                this.indicePorUrgencia.get(paquete.getUrgencia()).add(paquete);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo leer el archivo de paquetes: " + pathPaquetes, e);
         }
     }
 

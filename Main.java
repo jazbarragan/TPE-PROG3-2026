@@ -26,11 +26,10 @@ public class Main {
         System.out.println("               PRUEBA DE SERVICIOS                ");
         System.out.println("==================================================");
 
-        Servicios servicios = new Servicios();
-        servicios.inicializarIndices(paquetes);
+        Servicios servicios = new Servicios("camiones.csv", "paquetes.csv");
 
         // Servicio 1: Búsqueda por Código
-        System.out.println("[Servicio 1] Buscando P001: " + servicios.servicio1("P001"));
+        System.out.println("[Servicio 1] Buscando PKG001: " + servicios.servicio1("PKG001"));
         System.out.println("[Servicio 1] Buscando inexistente: " + servicios.servicio1("P0dcer01"));
 
         // Servicio 2: Filtrado por Alimentos
@@ -38,7 +37,7 @@ public class Main {
         System.out.println("[Servicio 2] Paquetes sin alimentos: " + servicios.servicio2(false));
 
         // Servicio 3: Rango de Urgencia
-        System.out.println("\n[Servicio 3] Paquetes con urgencia entre 2 y 80: \n" + servicios.servicio3(2, 80));
+        System.out.println("\n[Servicio 3] Paquetes con urgencia entre 2 y 80: \n" + servicios.servicio3(50, 70));
 
         // -----------------------------------------------------------------
         // 3. EJECUCIÓN ALGORITMO GREEDY (Ávido)
