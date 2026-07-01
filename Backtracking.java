@@ -24,6 +24,7 @@ public class Backtracking {
     private ArrayList<Paquete> mejoresPaquetesNoAsignados;
     private float menorPesoNoAsignado;
     private int estadosGenerados;
+    private float pesoTotalPaquetes;
 
     public Solucion buscarMejorAsignacion(
             ArrayList<Paquete> paquetes,
@@ -31,36 +32,41 @@ public class Backtracking {
 
         ArrayList<Paquete> paquetesNoAsignadosActuales = new ArrayList<>();
 
-        mejorAsignacion = new ArrayList<>();
-        mejoresPaquetesNoAsignados = new ArrayList<>();
+        this.mejorAsignacion = new ArrayList<>();
+        this.mejoresPaquetesNoAsignados = new ArrayList<>();
 
-        menorPesoNoAsignado = Float.MAX_VALUE;
-        estadosGenerados = 0;
+        this.menorPesoNoAsignado = Float.MAX_VALUE;
+        this.estadosGenerados = 0;
+        this.pesoTotalPaquetes = 0;
+
+        for (Paquete paquete : paquetes) {
+            this.pesoTotalPaquetes += paquete.getPeso();
+        }
 
         buscarAsignacion(camiones,
                 paquetesNoAsignadosActuales,
                 0,
-                paquetes);
+                paquetes,
+                pesoTotalPaquetes);
 
         return new Solucion("Backtracking", mejorAsignacion, mejoresPaquetesNoAsignados, estadosGenerados);
     }
 
     private void buscarAsignacion(ArrayList<Camion> camiones, ArrayList<Paquete> paquetesNoAsignadosActuales,
-            int indicePaquete, ArrayList<Paquete> paquetes) {
+            int indicePaquete, ArrayList<Paquete> paquetes, float pesoTotalPaquetes) {
 
         estadosGenerados++;
 
         if (indicePaquete >= paquetes.size()) {
 
-            float pesoNoAsignadoActual = calcularPesoNoAsignado(paquetesNoAsignadosActuales);
 
-            if (pesoNoAsignadoActual < menorPesoNoAsignado) {
+            if (pesoTotalPaquetes < menorPesoNoAsignado) {
 
-                menorPesoNoAsignado = pesoNoAsignadoActual;
+                menorPesoNoAsignado = pesoTotalPaquetes;
 
-                mejoresPaquetesNoAsignados = new ArrayList<>(paquetesNoAsignadosActuales);
+                this.mejoresPaquetesNoAsignados = new ArrayList<>(paquetesNoAsignadosActuales);
 
-                mejorAsignacion = copiarCamiones(camiones);
+                this.mejorAsignacion = copiarCamiones(camiones);
             }
 
             return;
@@ -73,16 +79,18 @@ public class Backtracking {
             if (puedeAsignarse(paqueteActual, camionActual)) {
 
                 camionActual.cargarPaquete(paqueteActual);
-
-                buscarAsignacion(camiones, paquetesNoAsignadosActuales, indicePaquete + 1, paquetes);
+                //descontar peso no asignado
+                pesoTotalPaquetes -= paqueteActual.getPeso();
+                buscarAsignacion(camiones, paquetesNoAsignadosActuales, indicePaquete + 1, paquetes, pesoTotalPaquetes);
 
                 camionActual.descagarPaqute(paqueteActual);
+                pesoTotalPaquetes += paqueteActual.getPeso();
             }
         }
 
         paquetesNoAsignadosActuales.add(paqueteActual);
 
-        buscarAsignacion(camiones, paquetesNoAsignadosActuales, indicePaquete + 1, paquetes);
+        buscarAsignacion(camiones, paquetesNoAsignadosActuales, indicePaquete + 1, paquetes, pesoTotalPaquetes);
 
         paquetesNoAsignadosActuales.remove(paquetesNoAsignadosActuales.size() - 1);
     }
@@ -94,16 +102,6 @@ public class Backtracking {
                         || camion.isRefrigerado());
     }
 
-    private float calcularPesoNoAsignado(ArrayList<Paquete> paquetesNoAsignados) {
-
-        float pesoTotal = 0;
-
-        for (Paquete paquete : paquetesNoAsignados) {
-            pesoTotal += paquete.getPeso();
-        }
-
-        return pesoTotal;
-    }
 
     private ArrayList<Camion> copiarCamiones(ArrayList<Camion> camiones) {
 

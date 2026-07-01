@@ -13,6 +13,7 @@ public class Servicios {
     private final Map<String, Paquete> indicePorCodigo;
     private final Map<Boolean, List<Paquete>> indiceAlimentos;
     private final TreeMap<Integer, List<Paquete>> indicePorUrgencia;
+    private List<Camion> camiones;
 
 
     public Servicios(String pathCamiones, String pathPaquetes) {
@@ -22,10 +23,36 @@ public class Servicios {
 
         this.indiceAlimentos.put(true, new ArrayList<>());
         this.indiceAlimentos.put(false, new ArrayList<>());
-        inicializarDesdeCsv(pathPaquetes);
+        inicializarPaquetesDesdeCsv(pathPaquetes);
+
+        this.camiones = new ArrayList<>();
+        inicializarCamionesDesdeCsv(pathCamiones);
+
+    }
+    //leer el csv de camiones
+    private void inicializarCamionesDesdeCsv(String pathCamiones) {
+        try {
+            Path path = Paths.get(pathCamiones);
+            List<String> lineas = Files.readAllLines(path);
+
+            for (int i = 1; i < lineas.size(); i++) {
+                String[] partes = lineas.get(i).split(";");
+
+                int id = Integer.parseInt(partes[0]);
+                String patente = partes[1];
+                boolean refrigerado = partes[2].equals("1");
+                Float capacidadMaxima = Float.parseFloat(partes[3]);
+
+                Camion camion = new Camion(id, patente, refrigerado, capacidadMaxima);
+                this.camiones.add(camion);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo leer el archivo de camiones: " + pathCamiones, e);
+        }
     }
 
-    private void inicializarDesdeCsv(String pathPaquetes) {
+     //leer el csv de paquetes
+    private void inicializarPaquetesDesdeCsv(String pathPaquetes) {
         try {
             Path path = Paths.get(pathPaquetes);
             List<String> lineas = Files.readAllLines(path);
