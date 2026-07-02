@@ -28,6 +28,7 @@ public class Greedy {
         ArrayList<Camion> camionesUtilizados = new ArrayList<>();
 
         paquetes = ordenarPaquetesPorPeso(paquetes);
+        
         camiones = ordenarCamionesPorCapacidad(camiones);
 
         while (!paquetes.isEmpty()) {
@@ -67,7 +68,7 @@ public class Greedy {
     public ArrayList<Camion> ordenarCamionesPorCapacidad(ArrayList<Camion> camiones) {
 
         camiones.sort((c1, c2) ->
-                Float.compare(c1.getCapacidadMaxima(), c2.getCapacidadMaxima()));
+                Float.compare(c2.getCapacidadMaxima(), c1.getCapacidadMaxima()));
 
         return camiones;
     }
